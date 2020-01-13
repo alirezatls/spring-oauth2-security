@@ -19,7 +19,7 @@ import org.springframework.security.oauth2.provider.token.store.InMemoryTokenSto
 // @EnableAuthorizationServer MUST be in class
 //--------------------------------------------------------------
 @Configuration
-@EnableAuthorizationServer
+//@EnableAuthorizationServer
 public class DefaultAuthorizationServerConfiguration extends AuthorizationServerConfigurerAdapter {
 
     private AuthenticationManager authenticationManager;
@@ -53,6 +53,7 @@ public class DefaultAuthorizationServerConfiguration extends AuthorizationServer
                 .secret("secret")
                 .autoApprove(true)
                 .scopes("read", "write")
+                .resourceIds("sample-resource")
                 .authorizedGrantTypes("client-credentials", "password", "refresh-token")
                 .authorities("ROLE_USER", "ROLE_ADMIN")
                 .accessTokenValiditySeconds(100000000)
