@@ -9,31 +9,32 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.A
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
-import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
+import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
 
 import javax.sql.DataSource;
 
-
 //--------------------------------------------------------------
-// storing clients information in a database like MYSQL
+// AuthorizationServer that used Redis for TokenStore
 //--------------------------------------------------------------
 @Configuration
-//@EnableAuthorizationServer
-public class JDBCAuthorizationServerConfiguration extends AuthorizationServerConfigurerAdapter {
+@EnableAuthorizationServer
+public class AuthorizationServerConfigurationWithRedisTokenStore extends AuthorizationServerConfigurerAdapter {
 
     private AuthenticationManager authenticationManager;
     private DataSource dataSource;
+    private RedisTokenStore tokenStore;
 
     @Autowired
-    public JDBCAuthorizationServerConfiguration(AuthenticationManager authenticationManager, DataSource dataSource) {
+    public AuthorizationServerConfigurationWithRedisTokenStore(AuthenticationManager authenticationManager, DataSource dataSource, RedisTokenStore tokenStore) {
         this.authenticationManager = authenticationManager;
         this.dataSource = dataSource;
+        this.tokenStore = tokenStore;
     }
 
     @Override
     public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
-        security.tokenKeyAccess("permitAll()")
-                .checkTokenAccess("permitAll()")
+        security.checkTokenAccess("permitAll()")
+                .tokenKeyAccess("permitAll()")
                 .passwordEncoder(NoOpPasswordEncoder.getInstance());
     }
 
@@ -44,7 +45,7 @@ public class JDBCAuthorizationServerConfiguration extends AuthorizationServerCon
 
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-        endpoints.tokenStore(new InMemoryTokenStore())
-                .authenticationManager(authenticationManager);
+        endpoints.authenticationManager(authenticationManager)
+                .tokenStore(tokenStore);
     }
 }
