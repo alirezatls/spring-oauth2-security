@@ -1,4 +1,4 @@
-package com.sample.oauth2service.config;
+package com.sample.oauth2service.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +15,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeRequests()
+                .antMatchers("/oauth/**").permitAll()
                 .antMatchers("/api/user/**").permitAll()
                 .antMatchers("/api/admin/**").permitAll();
 
@@ -40,6 +41,10 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                 .withUser("jon")
                 .password("snow")
                 .roles("USER")
+                .and()
+                .withUser("admin")
+                .password("1234")
+                .roles("ADMIN")
                 .and()
                 .passwordEncoder(NoOpPasswordEncoder.getInstance());
     }
